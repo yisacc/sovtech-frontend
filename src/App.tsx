@@ -3,7 +3,11 @@ import './App.css'
 import Router from './routes'
 
 function App() {
-  return <Router />
+  return (
+    <div className="App bg-dark-blue">
+      <Router />
+    </div>
+  )
 }
 
 export default App
