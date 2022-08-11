@@ -1,3 +1,4 @@
+import { List, Modal } from 'antd'
 import React, { useEffect, useState } from 'react'
 import CommonLayout from '../../components/CommonLayout/CommonLayout'
 import JokeModal from '../../components/ui/Modal/Modal'
@@ -11,7 +12,8 @@ export const PeoplePage: React.FC = () => {
   const [people, setPeople] = useState([])
   const [loading, setLoading] = useState(false)
   const [page, setPage] = useState(1)
-  const [joke, setJoke] = useState('')
+  const [joke, setJoke] = useState([])
+  const [peopleSearchResult, setPeopleSearchResult] = useState([])
   const [isModalVisible, setIsModalVisible] = useState(false)
   useEffect(() => {
     setLoading(true)
@@ -31,7 +33,8 @@ export const PeoplePage: React.FC = () => {
       .get('/search?query=' + value)
       .then((res) => {
         if (res.data) {
-          setJoke('Successfully searched for ' + value)
+          setJoke(res.data?.jokes.result)
+          setPeopleSearchResult(res.data?.peoples?.results)
           setIsModalVisible(true)
         }
         setLoading(false)
@@ -42,7 +45,8 @@ export const PeoplePage: React.FC = () => {
   }
   const handleModalCancel = () => {
     setIsModalVisible(false)
-    setJoke('')
+    setJoke([])
+    setPeopleSearchResult([])
   }
   return (
     <CommonLayout>
@@ -69,11 +73,53 @@ export const PeoplePage: React.FC = () => {
         setCurrent={setPage}
         columns={Columns()}
       />
-      <JokeModal
-        isModalVisible={isModalVisible}
-        handleModalCancel={handleModalCancel}
-        joke={joke}
-      />
+      <Modal
+        visible={isModalVisible}
+        closable={true}
+        centered={true}
+        maskClosable={false}
+        destroyOnClose={true}
+        onCancel={handleModalCancel}
+        footer={null}
+        width={860}
+      >
+        <div className={'flex w-full justify-center'}>
+          <div className={'mb-3 font-medium'}>
+            {joke && joke.length > 0 ? (
+              <>
+                <PageTitle title="Jokes" />
+                <List
+                  itemLayout="horizontal"
+                  dataSource={joke}
+                  size={'large'}
+                  style={{ minWidth: '100%', width: '100%' }}
+                  renderItem={(item: any) => (
+                    <List.Item>
+                      <List.Item.Meta title={<p>{item.value}</p>} />
+                    </List.Item>
+                  )}
+                />
+              </>
+            ) : null}
+            {peopleSearchResult && peopleSearchResult.length > 0 ? (
+              <>
+                <PageTitle title="People" />
+                <TableComponent
+                  data={peopleSearchResult}
+                  loading={loading}
+                  meta={{
+                    pageSize: 10,
+                    current: 1,
+                    defaultPageSize: 10,
+                  }}
+                  setCurrent={setPage}
+                  columns={Columns()}
+                />
+              </>
+            ) : null}
+          </div>
+        </div>
+      </Modal>
     </CommonLayout>
   )
 }
