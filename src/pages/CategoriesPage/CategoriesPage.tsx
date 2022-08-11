@@ -32,7 +32,7 @@ export const CategoriesPage: React.FC = () => {
   return (
     <CommonLayout>
       <PageTitle title="Categories" />
-      <div className="container mx-auto p-16 grid grid-rows-4 grid-flow-col gap-4">
+      <div className="container mx-auto p-16 grid grid-rows-3 grid-flow-col gap-4">
         {categories.length > 0 &&
           categories.map((category, index) => (
             <Card key={index} name={category} handleClick={handleClick} />
